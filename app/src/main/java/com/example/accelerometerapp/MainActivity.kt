@@ -2,6 +2,8 @@ package com.example.accelerometerapp
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
+import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -16,9 +18,12 @@ import kotlinx.android.synthetic.main.fragment_recording.*
 import com.google.android.gms.location.*
 import android.content.pm.PackageManager
 import android.location.Location
+import android.util.Log
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlin.math.abs
@@ -34,7 +39,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var request: LocationRequest
     private val database = Firebase.database
     val myRef = database.getReference("test1")
-    fun setupLocation() {
+    private val  auth= FirebaseAuth.getInstance()
+    private fun setupLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.applicationContext)
 
         if (ActivityCompat.checkSelfPermission(
@@ -62,6 +68,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         setContentView(R.layout.fragment_recording)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+        login()
+//        print(auth.currentUser!!.email)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         square = findViewById(R.id.tv_square)
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
@@ -82,6 +90,29 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
     }
+    fun login(){
+        val email="test2@gmail.pl"
+        val password="Zaq12wsx"
+//        auth.signInAnonymously()
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "signInWithEmail:success")
+                    val user = auth.currentUser
+
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "signInWithEmail:failure", task.exception)
+                    Toast.makeText(baseContext, "Authentication failed.",
+                        Toast.LENGTH_SHORT).show()
+
+                }
+            }
+
+
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun setUpSensorStuff() {
@@ -108,7 +139,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         request.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         setupLocation()
         val routeID = Random.nextInt().toString()
-        val userID = "to_bedzie_id_uzytkownika"
+
         val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION
         )
         var locationWithAccelerationCache = arrayOf<LocationWithAcceleration>()
@@ -117,6 +148,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             // received, store the location in Firebase
             locationCallback = object : LocationCallback() {
                 override fun onLocationResult(locationResult: LocationResult) {
+                    val userID = auth.currentUser!!.uid
                     val location: Location? = locationResult.lastLocation
                     val list = locationWithAccelerationCache.toMutableList()
                     list.add(LocationWithAcceleration(location!!.latitude,location!!.longitude,
@@ -171,6 +203,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
             //tu Roman dodaje kod zapisujący do bazy
+//            wcale nie tutaj
         }
     }
 
