@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "455774968163",
+    "firebase_url": "https://inzynierka-9fac2-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "inzynierka-9fac2",
+    "storage_bucket": "inzynierka-9fac2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:455774968163:android:b43bfd8792e2b831039b56",
+        "android_client_info": {
+          "package_name": "com.example.accelerometerapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "455774968163-dcod5f35mfgvt79bckf83ppeh6vpq8vd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8xoEvwNYDvPanw-q2TWkAqv87-u9IWlk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "455774968163-dcod5f35mfgvt79bckf83ppeh6vpq8vd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

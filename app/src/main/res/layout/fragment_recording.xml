@@ -8,8 +8,8 @@
 
     <TextView
         android:id="@+id/tv_square"
-        android:layout_width="match_parent"
-        android:layout_height="630dp"
+        android:layout_width="383dp"
+        android:layout_height="397dp"
         android:layout_centerInParent="true"
         android:background="@color/teal_200"
         android:gravity="center"
@@ -33,6 +33,14 @@
         android:layout_marginRight="69dp"
         android:layout_marginBottom="3dp"
         android:text="Start/stop recording"/>
+
+    <TextView
+        android:id="@+id/tv_gps"
+        android:layout_width="match_parent"
+        android:layout_height="101dp"
+        android:layout_below="@+id/tv_square"
+        android:layout_marginTop="36dp"
+        android:text="TextView" />
 
 
 </RelativeLayout>
