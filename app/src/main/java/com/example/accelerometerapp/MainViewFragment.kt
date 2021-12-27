@@ -1,10 +1,17 @@
 package com.example.accelerometerapp
 
+import android.app.Application
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.myflicks.MainViewModel
+import kotlinx.android.synthetic.main.fragment_main_view.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -20,6 +27,8 @@ class MainViewFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var mainViewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +43,24 @@ class MainViewFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        mainViewModel = ViewModelProvider(requireActivity(), ViewModelProvider.AndroidViewModelFactory.getInstance(
+            Application()
+        )).get(MainViewModel::class.java)
+
+        viewManager= LinearLayoutManager(requireContext())
         return inflater.inflate(R.layout.fragment_main_view, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        recyclerView.layoutManager = viewManager
+        //przypisanie adaptera
+        setupAdapter(mainViewModel.listOfJourneys,mainViewModel)
+    }
+
+    private fun setupAdapter(arrayData : ArrayList<JourneyRow>, mainViewModel: MainViewModel){
+        recyclerView.adapter = JourneyAdapter(arrayData,mainViewModel)
     }
 
     companion object {

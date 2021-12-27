@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav.xml"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.accelerometerapp.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_mainViewFragment"
+            app:destination="@id/mainViewFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_registrationFragment"
+            app:destination="@id/registrationFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_recordingFragment"
+            app:destination="@id/recordingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mainViewFragment"
+        android:name="com.example.accelerometerapp.MainViewFragment"
+        android:label="fragment_main_view"
+        tools:layout="@layout/fragment_main_view" >
+        <action
+            android:id="@+id/action_mainViewFragment_to_recordingFragment"
+            app:destination="@id/recordingFragment" />
+        <action
+            android:id="@+id/action_mainViewFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_mainViewFragment_to_newJourneyFragment"
+            app:destination="@id/newJourneyFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/registrationFragment"
+        android:name="com.example.accelerometerapp.RegistrationFragment"
+        android:label="fragment_registration"
+        tools:layout="@layout/fragment_registration" >
+        <action
+            android:id="@+id/action_registrationFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recordingFragment"
+        android:name="com.example.accelerometerapp.RecordingFragment"
+        android:label="fragment_recording"
+        tools:layout="@layout/fragment_recording" >
+        <action
+            android:id="@+id/action_recordingFragment_to_mainViewFragment"
+            app:destination="@id/mainViewFragment" />
+        <action
+            android:id="@+id/action_recordingFragment_to_newJourneyFragment"
+            app:destination="@id/newJourneyFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newJourneyFragment"
+        android:name="com.example.accelerometerapp.NewJourneyFragment"
+        android:label="fragment_new_journey"
+        tools:layout="@layout/fragment_new_journey" >
+        <action
+            android:id="@+id/action_newJourneyFragment_to_recordingFragment"
+            app:destination="@id/recordingFragment" />
+        <action
+            android:id="@+id/action_newJourneyFragment_to_mainViewFragment"
+            app:destination="@id/mainViewFragment" />
+    </fragment>
+</navigation>

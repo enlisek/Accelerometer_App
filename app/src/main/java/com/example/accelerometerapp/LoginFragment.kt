@@ -1,10 +1,16 @@
 package com.example.accelerometerapp
 
+import android.app.Application
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import com.example.myflicks.MainViewModel
+import kotlinx.android.synthetic.main.fragment_login.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -20,6 +26,8 @@ class LoginFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private lateinit var mainViewModel: MainViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +42,48 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        mainViewModel = ViewModelProvider(requireActivity(), ViewModelProvider.AndroidViewModelFactory.getInstance(
+            Application()
+        )).get(MainViewModel::class.java)
         return inflater.inflate(R.layout.fragment_login, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        buttonLogin.setOnClickListener { view -> kotlin.run {
+            var email = editTextLoginEmail.text.toString().trim()
+            var password = editTextLoginPassword.text.toString()
+            if (email.isEmpty())
+            {
+                editTextLoginEmail.error = "E-mail is required."
+            }
+            else
+            {
+                if(password.isEmpty())
+                {
+                    editTextLoginPassword.error = "Password is required."
+                }
+                else
+                {
+                    mainViewModel.auth.signInWithEmailAndPassword(email,password).addOnCompleteListener { task ->
+                        if (task.isSuccessful)
+                        {
+                            view.findNavController().navigate(R.id.action_loginFragment_to_recordingFragment)
+
+                        } else {
+                            Toast.makeText(context,"Error. " + (task.exception?.message ?: ""),
+                                Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+            }
+        }
+        }
+
+        buttonLoginToRegister.setOnClickListener { view -> view.findNavController().navigate(R.id.action_loginFragment_to_registrationFragment) }
+    }
     companion object {
         /**
          * Use this factory method to create a new instance of
