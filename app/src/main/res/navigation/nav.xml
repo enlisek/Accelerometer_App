@@ -55,6 +55,9 @@
         <action
             android:id="@+id/action_recordingFragment_to_newJourneyFragment"
             app:destination="@id/newJourneyFragment" />
+        <action
+            android:id="@+id/action_recordingFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/newJourneyFragment"
@@ -67,5 +70,8 @@
         <action
             android:id="@+id/action_newJourneyFragment_to_mainViewFragment"
             app:destination="@id/mainViewFragment" />
+        <action
+            android:id="@+id/action_newJourneyFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
 </navigation>

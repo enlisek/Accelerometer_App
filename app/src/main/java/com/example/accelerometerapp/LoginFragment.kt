@@ -1,6 +1,7 @@
 package com.example.accelerometerapp
 
 import android.app.Application
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import com.example.myflicks.MainViewModel
 import kotlinx.android.synthetic.main.fragment_login.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -45,6 +45,7 @@ class LoginFragment : Fragment() {
         mainViewModel = ViewModelProvider(requireActivity(), ViewModelProvider.AndroidViewModelFactory.getInstance(
             Application()
         )).get(MainViewModel::class.java)
+
         return inflater.inflate(R.layout.fragment_login, container, false)
     }
 
@@ -69,7 +70,8 @@ class LoginFragment : Fragment() {
                     mainViewModel.auth.signInWithEmailAndPassword(email,password).addOnCompleteListener { task ->
                         if (task.isSuccessful)
                         {
-                            view.findNavController().navigate(R.id.action_loginFragment_to_recordingFragment)
+                            mainViewModel.userId = mainViewModel.auth.currentUser!!.uid
+                            view.findNavController().navigate(R.id.action_loginFragment_to_mainViewFragment)
 
                         } else {
                             Toast.makeText(context,"Error. " + (task.exception?.message ?: ""),
@@ -77,13 +79,13 @@ class LoginFragment : Fragment() {
                         }
                     }
                 }
-
             }
         }
         }
 
         buttonLoginToRegister.setOnClickListener { view -> view.findNavController().navigate(R.id.action_loginFragment_to_registrationFragment) }
     }
+
     companion object {
         /**
          * Use this factory method to create a new instance of

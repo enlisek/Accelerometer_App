@@ -1,4 +1,4 @@
-package com.example.myflicks
+package com.example.accelerometerapp
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -10,13 +10,17 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class MainViewModel(application: Application):AndroidViewModel(application) {
-    val database = Firebase.database
-    val myRef = database.getReference("test1")
-    val auth = FirebaseAuth.getInstance()
-
-    var listOfJourneys: ArrayList<JourneyRow> = ArrayList()
 
     var journeyName = ""
     var journeyAdditionalComments: String? = null
+    val database = Firebase.database
+    var userId = ""
 
+    var userRef = database.getReference(userId)
+    val auth = FirebaseAuth.getInstance()
+
+    var listOfJourneys: ArrayList<JourneyRow> = ArrayList()
+    val myRef = database.getReference("test6")
+
+    var routeID = ""
 }

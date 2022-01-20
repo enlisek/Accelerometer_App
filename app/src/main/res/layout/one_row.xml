@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,11 +9,14 @@
     android:layout_marginTop="10dp"
     android:layout_marginEnd="10dp"
     android:layout_marginRight="10dp"
+    android:addStatesFromChildren="false"
+    android:alwaysDrawnWithCache="false"
+    android:fadingEdge="horizontal"
     android:orientation="vertical"
     android:paddingLeft="10dp"
     android:paddingTop="5dp"
     android:paddingRight="10dp"
-    android:paddingBottom="10dp"
+    android:paddingBottom="5dp"
     tools:ignore="MissingDefaultResource">
 
     <TextView
@@ -26,14 +30,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="Gliwice - Rybnik"
-        android:textSize="18sp"
+        android:textColor="@color/purple_700"
+        android:textSize="24sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/textViewAdditionalComments"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Additional comments" />
+        android:text="Additional comments"
+        android:textSize="14sp" />
 
 
 </LinearLayout>

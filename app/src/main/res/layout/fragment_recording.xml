@@ -7,62 +7,53 @@
     android:layout_height="match_parent"
     tools:context=".RecordingFragment">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/topAppBar"
-        style="@style/Widget.MaterialComponents.Toolbar.Primary"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:menu="@menu/top_app_bar"
-        app:navigationIcon="@drawable/ic_menu_24"
-        app:title="@string/page_title" />
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </com.google.android.material.appbar.AppBarLayout>
-
     <TextView
         android:id="@+id/tv_acc"
-        android:layout_width="170dp"
-        android:layout_height="116dp"
+        android:layout_width="286dp"
+        android:layout_height="119dp"
+        android:background="@color/teal_200"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_gps"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.89" />
+
+    <Button
+        android:id="@+id/RecordingButton"
+        android:layout_width="190dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="204dp"
+        android:text="Start recording"
+        app:layout_constraintBottom_toTopOf="@+id/FinishButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_gps"
+        android:layout_width="285dp"
+        android:layout_height="149dp"
+        android:layout_marginBottom="20dp"
         android:background="@color/teal_200"
         android:gravity="center"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/RecordingButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topAppBar"
-        app:layout_constraintVertical_bias="0.295" />
-
-    <Button
-        android:id="@+id/RecordingButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="68dp"
-        android:text="Start recording"
-        app:layout_constraintBottom_toTopOf="@+id/tv_gps"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_gps"
-        android:layout_width="204dp"
-        android:layout_height="31dp"
-        android:layout_marginBottom="280dp"
-        android:text="TextView"
+    <Button
+        android:id="@+id/FinishButton"
+        android:layout_width="266dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="24dp"
+        android:text="Finish your journey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.536"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

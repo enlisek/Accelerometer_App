@@ -3,8 +3,10 @@ package com.example.accelerometerapp
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -13,20 +15,20 @@ import android.hardware.SensorManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.os.IBinder
+import android.view.*
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.example.myflicks.MainViewModel
+import androidx.navigation.findNavController
 import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.fragment_recording.*
 import kotlin.math.abs
-import kotlin.random.Random
+import kotlin.math.roundToInt
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -50,6 +52,7 @@ class RecordingFragment : Fragment(), SensorEventListener {
     private lateinit var locationCallback: LocationCallback
     private lateinit var request: LocationRequest
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var intent: Intent
     var accX = 0.0f
     var accY = 0.0f
     var accZ = 0.0f
@@ -63,15 +66,18 @@ class RecordingFragment : Fragment(), SensorEventListener {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         mainViewModel = ViewModelProvider(
-            requireActivity(), ViewModelProvider.AndroidViewModelFactory.getInstance(
+                requireActivity(), ViewModelProvider.AndroidViewModelFactory.getInstance(
                 Application()
-            )
+        )
         ).get(MainViewModel::class.java)
+
+        setHasOptionsMenu(true)
+        intent = Intent(context, MyService::class.java)
+
         return inflater.inflate(R.layout.fragment_recording, container, false)
     }
 
@@ -86,7 +92,7 @@ class RecordingFragment : Fragment(), SensorEventListener {
         tv_acceletometer = tv_acc
         sensorManager = requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(
-            requireActivity()
+                requireActivity()
         )
 
         RecordingButton.setOnClickListener {
@@ -94,7 +100,7 @@ class RecordingFragment : Fragment(), SensorEventListener {
                 setUpSensorStuff();
                 setupLocationStuff()
                 ifRecord = true;
-                RecordingButton.text = "Stop recording"
+                RecordingButton.text = "Pause recording"
             }
             else {
                 sensorManager.unregisterListener(this)
@@ -104,79 +110,103 @@ class RecordingFragment : Fragment(), SensorEventListener {
             }
         }
 
+        FinishButton.setOnClickListener {
+            sensorManager.unregisterListener(this)
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+            ifRecord = false
+            view.findNavController().navigate(R.id.action_recordingFragment_to_mainViewFragment)
+        }
+
     }
+
+
+    private lateinit var mService: MyService
+    private var mBound: Boolean = false
+
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as MyService.LocalBinder
+            mService = binder.getService(mainViewModel.userId, mainViewModel.routeID, mainViewModel.myRef)
+            mBound = true
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
+
 
     private fun setupLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
         if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
+                        requireContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                1000
+                    requireActivity(),
+                    arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    ),
+                    1000
             )
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setupLocationStuff(){
+    public fun setupLocationStuff(){
 
         val request = LocationRequest()
         request.interval = 1000
         request.fastestInterval = 1000
         request.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         setupLocation()
-        val routeID = Random.nextInt().toString()
 
         val permission = ContextCompat.checkSelfPermission(
-            requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
         )
         var locationWithAccelerationCache = arrayOf<LocationWithAcceleration>()
         if (permission == PackageManager.PERMISSION_GRANTED) {
-            // Request location updates and when an update is
-            // received, store the location in Firebase
             locationCallback = object : LocationCallback() {
                 override fun onLocationResult(locationResult: LocationResult) {
-                    val userID = mainViewModel.auth.currentUser!!.uid
+                    val userID = mainViewModel.userId
                     val location: Location? = locationResult.lastLocation
                     val list = locationWithAccelerationCache.toMutableList()
                     list.add(
-                        LocationWithAcceleration(
-                            location!!.latitude,
-                            location!!.longitude,
-                            location!!.altitude,
-                            location!!.accuracy,
-                            location!!.speed,
-                            accX,
-                            accY,
-                            accZ
-                        )
+                            LocationWithAcceleration(
+                                    location!!.latitude,
+                                    location!!.longitude,
+                                    location!!.altitude,
+                                    location!!.accuracy,
+                                    location!!.speed,
+                                    accX,
+                                    accY,
+                                    accZ
+                            )
                     )
                     locationWithAccelerationCache = list.toTypedArray()
-                    tv_gps.text = "alt = ${location!!.altitude}\n" +
-                            "long = ${location!!.longitude }\n" +
-                            "lat = ${location!!.latitude }\n" +
-                            "speed = ${location!!.speed }\n" +
-                            "acc = ${location!!.accuracy }\n"
-                    tv_acceletometer.text = "X axis: ${Math.round(accX * 10)/10.0}\nY axis: ${Math.round(
-                        accY * 10
-                    )/10.0}\nZ axis: ${Math.round(accZ * 10)/10.0}"
+                    tv_gps.text = "GPS\n" +
+                            "alt = ${(location!!.altitude * 1000).roundToInt() /1000.0}\n" +
+                            "long = ${(location!!.altitude * 1000).roundToInt() /1000.0}\n" +
+                            "lat = ${(location!!.latitude * 1000).roundToInt() /1000.0}\n" +
+                            "speed = ${(location!!.speed * 1000).roundToInt() /1000.0}\n" +
+                            "acc = ${(location!!.accuracy * 1000).roundToInt() /1000.0}\n"
+                    tv_acceletometer.text = "Acceleration\n" +
+                            "X axis: ${(accX * 10).roundToInt() /10.0}\n" +
+                            "Y axis: ${(accY * 10).roundToInt() /10.0}\n" +
+                            "Z axis: ${(accZ * 10).roundToInt() /10.0}"
                     accX = 0.0f
                     accY = 0.0f
                     accZ = 0.0f
                     if(locationWithAccelerationCache.size == 10){
-                        mainViewModel.myRef.child(userID).child(routeID).child(
-                            System.currentTimeMillis().toString()
+                        mainViewModel.myRef.child(userID).child(mainViewModel.routeID).child(
+                                System.currentTimeMillis().toString()
                         ).setValue(locationWithAccelerationCache.toList())
                         locationWithAccelerationCache = arrayOf<LocationWithAcceleration>()
                     }
@@ -184,27 +214,34 @@ class RecordingFragment : Fragment(), SensorEventListener {
             }
             fusedLocationProviderClient.requestLocationUpdates(request, locationCallback, null)}
         else{
-            tv_gps.text = "Nie ma połączenia"
+            tv_gps.text = "Connection broken"
         }
+    }
 
+    override fun onPause() {
+        super.onPause()
+        if(ifRecord) {
+            requireContext().bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mBound = false
+        if (ifRecord) {
+            requireContext().unbindService(connection)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun setUpSensorStuff() {
         sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.also {
             sensorManager.registerListener(
-                this, it,
-                SensorManager.SENSOR_DELAY_NORMAL,
-                SensorManager.SENSOR_DELAY_NORMAL
+                    this, it,
+                    SensorManager.SENSOR_DELAY_NORMAL,
+                    SensorManager.SENSOR_DELAY_NORMAL
             )
         }
-    }
-
-    private fun setupLocationRequest(){
-        request = LocationRequest()
-        request.interval = 5000
-        request.fastestInterval = 5000
-        request.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
@@ -223,17 +260,34 @@ class RecordingFragment : Fragment(), SensorEventListener {
             {
                 accZ = event.values[2]
             }
-
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        TODO("Not yet implemented")
+        return
     }
 
     override fun onDestroy() {
         sensorManager.unregisterListener(this)
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+
         super.onDestroy()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.log_out -> {
+                mainViewModel.auth.signOut()
+                requireView().findNavController().navigate(R.id.action_recordingFragment_to_loginFragment)
+                return true
+            }
+            else -> false
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.top_app_bar, menu)
     }
 
     companion object {

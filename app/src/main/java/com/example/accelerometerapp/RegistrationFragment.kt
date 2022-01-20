@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import com.example.myflicks.MainViewModel
 import kotlinx.android.synthetic.main.fragment_registration.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -84,12 +83,10 @@ class RegistrationFragment : Fragment() {
                             }
                         }
                     }
-
                 }
             }
         }
         }
-
         buttonRegisterToLogin.setOnClickListener { view -> view.findNavController().navigate(R.id.action_registrationFragment_to_loginFragment) }
     }
 

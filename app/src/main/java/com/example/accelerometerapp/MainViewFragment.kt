@@ -2,15 +2,15 @@ package com.example.accelerometerapp
 
 import android.app.Application
 import android.os.Bundle
-import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myflicks.MainViewModel
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.fragment_main_view.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -47,6 +47,8 @@ class MainViewFragment : Fragment() {
             Application()
         )).get(MainViewModel::class.java)
 
+        setHasOptionsMenu(true)
+
         viewManager= LinearLayoutManager(requireContext())
         return inflater.inflate(R.layout.fragment_main_view, container, false)
     }
@@ -55,12 +57,50 @@ class MainViewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView.layoutManager = viewManager
-        //przypisanie adaptera
-        setupAdapter(mainViewModel.listOfJourneys,mainViewModel)
+        setupAdapter(mainViewModel.listOfJourneys)
+
+        mainViewModel.userRef = mainViewModel.database.getReference("test6/"+mainViewModel.userId)
+        mainViewModel.userRef.addValueEventListener(object: ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(datasnapshot: DataSnapshot) {
+                mainViewModel.listOfJourneys = ArrayList()
+
+                for (row in datasnapshot.children) {
+                    val newRow = row.getValue(JourneyRow::class.java)
+                    mainViewModel.listOfJourneys.add(newRow!!)
+                }
+                if (recyclerView != null)
+                {
+                    setupAdapter(mainViewModel.listOfJourneys)
+                }
+            }
+        })
+
+        NewJourneyButton.setOnClickListener {
+            view.findNavController().navigate(R.id.action_mainViewFragment_to_newJourneyFragment)
+        }
     }
 
-    private fun setupAdapter(arrayData : ArrayList<JourneyRow>, mainViewModel: MainViewModel){
-        recyclerView.adapter = JourneyAdapter(arrayData,mainViewModel)
+    private fun setupAdapter(arrayData : ArrayList<JourneyRow>){
+        recyclerView.adapter = JourneyAdapter(arrayData)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.log_out -> {
+                mainViewModel.auth.signOut()
+                requireView().findNavController().navigate(R.id.action_mainViewFragment_to_loginFragment)
+                return true
+            }
+            else -> false
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.top_app_bar, menu)
     }
 
     companion object {

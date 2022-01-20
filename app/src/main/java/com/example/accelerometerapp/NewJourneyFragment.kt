@@ -2,14 +2,12 @@ package com.example.accelerometerapp
 
 import android.app.Application
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import com.example.myflicks.MainViewModel
 import kotlinx.android.synthetic.main.fragment_new_journey.*
+import kotlin.random.Random
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,6 +41,9 @@ class NewJourneyFragment : Fragment() {
         mainViewModel = ViewModelProvider(requireActivity(), ViewModelProvider.AndroidViewModelFactory.getInstance(
             Application()
         )).get(MainViewModel::class.java)
+
+        setHasOptionsMenu(true)
+
         return inflater.inflate(R.layout.fragment_new_journey, container, false)
     }
 
@@ -52,9 +53,32 @@ class NewJourneyFragment : Fragment() {
         buttonNext.setOnClickListener { view -> run {
             mainViewModel.journeyName = editTextName.text.toString()
             mainViewModel.journeyAdditionalComments = editTextAdditionalComments.text.toString()
+
+            mainViewModel.routeID = Random.nextInt().toString()
+            mainViewModel.myRef.child(mainViewModel.userId).child(mainViewModel.routeID).child("name").setValue(mainViewModel.journeyName)
+            mainViewModel.myRef.child(mainViewModel.userId).child(mainViewModel.routeID).child("description").setValue(mainViewModel.journeyAdditionalComments)
+            mainViewModel.myRef.child(mainViewModel.userId).child(mainViewModel.routeID).child("startRoute").setValue(System.currentTimeMillis().toString())
+
             view.findNavController().navigate(R.id.action_newJourneyFragment_to_recordingFragment)
         } }
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.log_out -> {
+                mainViewModel.auth.signOut()
+                requireView().findNavController().navigate(R.id.action_newJourneyFragment_to_loginFragment)
+                return true
+            }
+            else -> false
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.top_app_bar, menu)
+    }
+
     companion object {
         /**
          * Use this factory method to create a new instance of
